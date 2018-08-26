@@ -7,6 +7,8 @@
 
 (in-package :coo)
 
+(defparameter +headings+ '(#\= #\- #\_ #\~ #\^))
+
 (defun document-package (name)
   "Generates documentation in html form for package named by :param:`name`."
 
@@ -20,10 +22,12 @@
       (docutils:write-html s document))))
 
 
-(defun make-title (title)
-  (let ((title-node (docutils:make-node 'docutils.nodes:title)))
-    (add-child title-node (docutils:make-node 'docutils.nodes:text :text title))
-    title-node))
+(defun make-title (title &key (level 0))
+  (let ((marker (make-string (length title) :initial-element (nth level +headings+))))
+    (format nil "~a~%~a~%~a"
+		 marker
+		 title
+		 marker)))
 
 
 (defun reparent-node (parent child)

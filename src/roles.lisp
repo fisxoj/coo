@@ -33,7 +33,7 @@ For example::
                          (-> symbol symbol-package package-name)
                          (if (eq :internal status) "::" ":")
                          (symbol-name symbol))))
-      string-dopwncase))
+      string-downcase))
 
 (defmacro defref (thing)
   `(def-role ,thing (symbol)
