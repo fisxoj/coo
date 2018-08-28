@@ -3,7 +3,9 @@
         #:alexandria
         #:cl-arrows
         #:docutils.parser.rst)
-  (:export #:*context-package*))
+  (:export #:*context-package*
+	   #:name-symbol
+	   #:find-symbol-by-name))
 
 (in-package :coo.roles)
 
@@ -11,7 +13,7 @@
   "If non-nil, the current package context.")
 
 (defun name-symbol (symbol)
-  "Used for formatting names of symbols.  Will take into account :variable:`*context-package* if non-nil.
+  "Used for formatting names of symbols.  Will take into account :variable:`*context-package*` if non-nil.
 
 For example::
   coo.roles> (name-symbol 'name-symbol)
@@ -35,9 +37,27 @@ For example::
                          (symbol-name symbol))))
       string-downcase))
 
+
+(defun find-symbol-by-name (str)
+  "Search for the symbol named by :param:`str` in the current context.  If it's unqualified, look in :variable:`*context-package*`, then ``common-lisp`` then give up."
+
+  (declare (type string str))
+
+  (let* ((qualified-p (position #\: str :test #'char=))
+	 (internal-p (str:containsp "::" str))
+	 (symbol-name (string-upcase (subseq str (if qualified-p (+ qualified-p (if internal-p 2 1)) 0)))))
+
+    (if qualified-p
+	(when-let ((package (find-package (string-upcase (subseq str 0 qualified-p)))))
+	  (find-symbol symbol-name package))
+	(if *context-package*
+	    (find-symbol symbol-name *context-package*)
+	    (find-symbol symbol-name (find-package :common-lisp))))))
+
+
 (defmacro defref (thing)
   `(def-role ,thing (symbol)
-     (if-let ((found-symbol (read-from-string symbol)))
+     (if-let ((found-symbol (find-symbol-by-name symbol)))
        (let ((node (docutils:make-node 'docutils.nodes:reference
                                        :refuri (string-downcase
                                                 (format nil ,(concatenate 'string
