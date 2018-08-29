@@ -10,7 +10,7 @@
 (in-package :coo.roles)
 
 (defvar *context-package* nil
-  "If non-nil, the current package context.")
+  "If non-nil, the current package context.  Influences the reading and printing of symbols by :function:`name-symbol` and :function:`find-symbol-by-name`.")
 
 (defun name-symbol (symbol)
   "Used for formatting names of symbols.  Will take into account :variable:`*context-package*` if non-nil.

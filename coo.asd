@@ -1,8 +1,10 @@
 (defsystem coo
   :author "Matt Novenstern <fisxoj@gmail.com>"
   :license "LLGPLv3+"
-  :depends-on ("alexandria"
+  :depends-on ("asdf"
+               "alexandria"
 	       "cl-arrows"
+               "str"
                "docutils")
   :pathname "src"
   :components ((:file "roles")
