@@ -11,6 +11,7 @@
 
 :root {
     font-family: "Fira", sans;
+    font-size: 16px;
 }
 
 /* used to remove borders from tables and images */
@@ -281,9 +282,62 @@ h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
 ul.auto-toc {
     list-style-type: none }
 
-.ref-class {
+/* Begin coo customization */
+
+.document {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h2 {
+    background: #eee;
+    border-width: 1px 0;
+    border-color: black;
+    border-style: solid;
+}
+
+.ref-package {
     font-family: mono;
     background-color: #eee;
+    color: #ab7967;
     padding: 3px;
     border-radius: 6px;
 }
+
+.ref-class {
+    font-family: mono;
+    background-color: #eee;
+    color: #99c794;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.ref-variable {
+    font-family: mono;
+    background-color: #eee;
+    color: #6699cc;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.ref-macro {
+    font-family: mono;
+    background-color: #eee;
+    color: #fac863;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.ref-function {
+    font-family: mono;
+    background-color: #eee;
+    color: #c594c5;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+p {
+    color: #343d46;
+}
+
+/* End coo customization */

@@ -156,7 +156,7 @@ If :param:`discover-packages` is true (the default), it will try to figure out a
 
     (info author)
     (when-let ((version (asdf:component-version system)))
-      (format stream "~&~15a~a" ":version:~%" version))
+      (format stream "~&~15a~a~%" ":version:" version))
     (info license)))
 
 
