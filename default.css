@@ -303,7 +303,7 @@ h2 {
 }
 
 .ref-package {
-    font-family: mono;
+    font-family: "Fira Mono", mono;
     background-color: #eee;
     color: #ab7967;
     padding: 3px;
@@ -311,7 +311,7 @@ h2 {
 }
 
 .ref-class {
-    font-family: mono;
+    font-family: "Fira Mono", mono;
     background-color: #eee;
     color: #99c794;
     padding: 3px;
@@ -319,7 +319,7 @@ h2 {
 }
 
 .ref-variable {
-    font-family: mono;
+    font-family: "Fira Mono", mono;
     background-color: #eee;
     color: #6699cc;
     padding: 3px;
@@ -327,7 +327,7 @@ h2 {
 }
 
 .ref-macro {
-    font-family: mono;
+    font-family: "Fira Mono", mono;
     background-color: #eee;
     color: #fac863;
     padding: 3px;
@@ -335,11 +335,16 @@ h2 {
 }
 
 .ref-function {
-    font-family: mono;
+    font-family: "Fira Mono", mono;
     background-color: #eee;
     color: #c594c5;
     padding: 3px;
     border-radius: 6px;
+}
+
+.param {
+    background-color: #eee;
+    color: #6699cc;
 }
 
 p {

@@ -111,3 +111,7 @@ For example::
       node)
     (docutils:report :error
                      `("Wasn't able to find package ~a, make sure it's spelled correctly and defined!" ,name))))
+
+
+(def-role param (name)
+  (docutils:make-node 'docutils.nodes:literal name :class "param"))

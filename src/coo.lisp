@@ -72,8 +72,9 @@
       ;; Start with the title of the package
       (make-title (str:concat (string-downcase (package-name package)) " package") s)
       ;; Write the package doumentation if it's defined
-      (when-let ((pkg-docs (documentation package t)))
-	(format s "~%~a~%~%" pkg-docs))
+      (if-let ((pkg-docs (documentation package t)))
+	(format s "~%~a~%~%" pkg-docs)
+        (format s "~%~%"))
 
       (let (variables macros classes functions)
 	(do-external-symbols (symbol package)
@@ -138,8 +139,7 @@ If :param:`discover-packages` is true (the default), it will try to figure out a
                                                                  (sort #'string<))
                                                              base-path)))))
 
-  (dolist (package-na.. class:: ref-package
-me (if discover-packages (discover-system-packages (asdf:component-name system)) packages))
+  (dolist (package-name (if discover-packages (discover-system-packages (asdf:component-name system)) packages))
       (let ((package (find-package package-name)))
         (document-package package base-path)))
 
