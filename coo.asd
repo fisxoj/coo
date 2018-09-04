@@ -2,7 +2,7 @@
   :author "Matt Novenstern"
   :mailto "fisxoj@gmail.com"
   :license "LLGPLv3+"
-  :homepage "https://github.com/fisxoj/coo"
+  :homepage "https://fisxoj.github.io/coo/"
   :depends-on ("asdf"
                "alexandria"
 	       "cl-arrows"
@@ -23,4 +23,6 @@ To generate documentation for your system, you should be able to run::
 and coo will take care of everything for you.  You can specify what directory it writes the documentation to as well.  Coo is built on top of `cl-docutils`_ by John A.R. Williams, which is, in turn modeled on the Python implementation of `Docutils`_.
 
 .. _cl-docutils: http://www.jarw.org.uk/lisp/cl-docutils.html
-.. _Docutils: http://docutils.sourceforge.net/")
+.. _Docutils: http://docutils.sourceforge.net/
+
+The source of coo is available at `https://github.com/fisxoj/coo <https://github.com/fisxoj/coo>`_.")
