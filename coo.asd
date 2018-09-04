@@ -1,7 +1,8 @@
-(defsystem coo
+(asdf:defsystem coo
   :author "Matt Novenstern"
   :mailto "fisxoj@gmail.com"
   :license "LLGPLv3+"
+  :homepage "https://github.com/fisxoj/coo"
   :depends-on ("asdf"
                "alexandria"
 	       "cl-arrows"
