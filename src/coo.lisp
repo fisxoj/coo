@@ -8,16 +8,10 @@
            #:document-system)
   (:documentation "Generally, you'll want to use :function:`document-system` to start yourself off.
 
-.. code-block:: common-lisp
+.. try running it like this::
 
-    >>> (ql:quickload :coo)
-    >>> (coo:document-system :my-cool-system)
-
-.. contents:: Contents
-
-_`Something`
-
-Here's some text and a referential link to `Another <#Something>`_
+    CL-USER> (ql:quickload :coo)
+    CL-USER> (coo:document-system :my-cool-system)
 "))
 
 (in-package :coo)
@@ -54,11 +48,15 @@ Here's some text and a referential link to `Another <#Something>`_
 
 
 (defun render-section (title type specs stream)
-  (declare (ignore type))
   (make-title title stream :level 1)
   (dolist (spec specs)
     (destructuring-bind (symbol . documentation) spec
-      (format stream "~&`~a`~%~%~a~%~%"
+      (format stream "~&.. _~a-~a:
+
+``~a``
+  ~a~%~%"
+              type
+              (coo.roles:anchor-name-for-symbol symbol)
               (string-downcase (symbol-name symbol))
               documentation))))
 
@@ -67,6 +65,7 @@ Here's some text and a referential link to `Another <#Something>`_
   (uiop:with-temporary-file (:stream s
 			     :pathname path
 			     :keep t
+                             :type "rst"
 			     :direction :output
 			     :element-type 'character)
     (let ((coo.roles:*context-package* package))
@@ -94,7 +93,7 @@ Here's some text and a referential link to `Another <#Something>`_
 	(when classes
 	  (render-section "Classes" "class" classes s))
 	(when functions
-	  (render-section "Functions" "function " functions s)))
+	  (render-section "Functions" "function" functions s)))
       path)))
 
 
@@ -133,12 +132,14 @@ If :param:`discover-packages` is true (the default), it will try to figure out a
     (uiop:ensure-all-directories-exist (list index-path))
     (with-open-file (s index-path :direction :output :if-exists :supersede :if-does-not-exist :create)
       (docutils:write-html s (docutils:read-rst (system-node system
-                                                             (if discover-packages
-                                                                 (discover-system-packages (asdf:component-name system))
-                                                                 packages)
+                                                             (-> (if discover-packages
+                                                                     (discover-system-packages (asdf:component-name system))
+                                                                     packages)
+                                                                 (sort #'string<))
                                                              base-path)))))
 
-  (dolist (package-name (if discover-packages (discover-system-packages (asdf:component-name system)) packages))
+  (dolist (package-na.. class:: ref-package
+me (if discover-packages (discover-system-packages (asdf:component-name system)) packages))
       (let ((package (find-package package-name)))
         (document-package package base-path)))
 
@@ -165,20 +166,21 @@ If :param:`discover-packages` is true (the default), it will try to figure out a
                              :pathname path
                              :direction :output
                              :keep t
+                             :type "rst"
                              :element-type 'character)
     (make-title (asdf:component-name system) s)
+
+    (system-collect-metadata system s)
 
     (format s "~&~a~%~%"
             (or (asdf:system-long-description system)
                 (asdf:system-description system)
                 ""))
 
-    (system-collect-metadata system s)
-
     (make-title "Packages" s :level 1)
     (dolist (package-name packages)
       (let ((package (find-package package-name)))
-        (format s "~%`~a <~a>`_~%~%"
+        (format s "~&* `~a <~a>`_~%~%"
                 (string-downcase package-name)
                 (package-path package))
         ;; (format s "~%`~a <~a>`_~%  ~a~%~%"

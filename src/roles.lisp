@@ -5,12 +5,25 @@
         #:docutils.parser.rst)
   (:export #:*context-package*
 	   #:name-symbol
-	   #:find-symbol-by-name))
+           #:anchor-name-for-symbol
+	   #:find-symbol-by-name)
+  (:documentation "This package defines a few new roles that are helpful for lisp documentation."))
 
 (in-package :coo.roles)
 
 (defvar *context-package* nil
   "If non-nil, the current package context.  Influences the reading and printing of symbols by :function:`name-symbol` and :function:`find-symbol-by-name`.")
+
+
+(defun anchor-name-for-symbol (symbol)
+  "Generates a url-safe name for :param:`symbol`.
+
+e.g. *some-variable* => \"%2Asome-variable%2A\""
+
+  (-> symbol
+      symbol-name
+      quri:url-encode))
+
 
 (defun name-symbol (symbol)
   "Used for formatting names of symbols.  Will take into account :variable:`*context-package*` if non-nil.
@@ -63,11 +76,11 @@ For example::
                                                 (format nil ,(concatenate 'string
                                                                           "~a.html#"
                                                                           (string-downcase thing)
-                                                                          "__~a")
+                                                                          "-~a")
                                                         (-> found-symbol
                                                             symbol-package
                                                             package-name)
-                                                        (symbol-name found-symbol)))
+                                                        (anchor-name-for-symbol found-symbol)))
                                        :class ,(concatenate 'string "ref-" (string-downcase thing)))))
 
          (docutils:add-child node (name-symbol found-symbol))

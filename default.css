@@ -9,11 +9,6 @@
    customize this style sheet.
  */
 
-:root {
-    font-family: "Fira", sans;
-    font-size: 16px;
-}
-
 /* used to remove borders from tables and images */
 .borderless, table.borderless td, table.borderless th {
     border: 0 }
@@ -284,9 +279,20 @@ ul.auto-toc {
 
 /* Begin coo customization */
 
+@import url("//fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans");
+
+:root {
+    font-family: "Fira Sans", sans-serif;
+    font-size: 16px;
+}
+
 .document {
     max-width: 1200px;
     margin: 0 auto;
+}
+
+span.pre {
+    font-family: "Fira Mono", monospace;
 }
 
 h2 {
