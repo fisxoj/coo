@@ -13,6 +13,7 @@
   :components ((:file "roles")
                (:file "coo"))
   :in-order-to ((test-op (test-op coo-test)))
+  :source-control (:git "https://github.com/fisxoj/coo.git")
   :description "Coo is a documentation processor that allows you to write your documentation in |RST|.  If you fill in all your docstrings, it will look at all the documentation for packages and systems and format the external symbols for each page.
 
 .. |RST| replace:: ReStructured Text
