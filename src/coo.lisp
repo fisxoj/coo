@@ -144,7 +144,8 @@ If :param:`discover-packages` is true (the default), it will try to figure out a
         (document-package package base-path)))
 
   ;; Copy styles to new directory
-  (uiop:copy-file #P"default.css" (merge-pathnames #P"default.css" base-path)))
+  (uiop:copy-file (asdf:system-relative-pathname :coo "default.css")
+                  (merge-pathnames #P"default.css" base-path)))
 
 
 (defun system-collect-metadata (system stream)
