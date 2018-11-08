@@ -1,10 +1,10 @@
 (defsystem coo-test
   :defsystem-depends-on ("prove-asdf")
   :depends-on ("coo"
-	       "prove")
+	       "rove")
   :pathname "t"
-  :components ((:test-file "coo"))
+  :components ((:file "coo")
+               (:file "roles"))
   :perform (test-op (op c)
 		    (declare (ignore c))
-		    (funcall (read-from-string "prove:run")
-			     (system-relative-pathname :coo-test #P"t/"))))
+		    (funcall (read-from-string "rove:run") c)))
