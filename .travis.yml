@@ -15,9 +15,7 @@ env:
 install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
-  - ros install prove
-  # Coveralls support
-  - git clone https://github.com/fukamachi/cl-coveralls ~/lisp/cl-coveralls
+  - ros install rove
 
 cache:
   directories:
@@ -29,4 +27,4 @@ before_script:
   - ros config
 
 script:
-  - run-prove coo-test.asd
+  - rove coo.asd
