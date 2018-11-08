@@ -98,7 +98,7 @@
       path)))
 
 
-(defconstant +sub-package-separators+
+(defparameter +sub-package-separators+
   '(#\/ #\.)
   "List of characters that could be used to separate a base package name like ``cool-package`` from sub-packages like ``cool-package.types`` or ``cool-package/types``.")
 
