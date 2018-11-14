@@ -69,18 +69,15 @@ For example::
 
 
 (defmacro defref (thing)
+  "Defines a new type of reference, e.g.::
+  (defref function)
+
+which lets you make references in your docstrings!"
+
   `(def-role ,thing (symbol)
      (if-let ((found-symbol (find-symbol-by-name symbol)))
        (let ((node (docutils:make-node 'docutils.nodes:reference
-                                       :refuri (string-downcase
-                                                (format nil ,(concatenate 'string
-                                                                          "~a.html#"
-                                                                          (string-downcase thing)
-                                                                          "-~a")
-                                                        (-> found-symbol
-                                                            symbol-package
-                                                            package-name)
-                                                        (anchor-name-for-symbol found-symbol)))
+                                       :refuri (coo::make-url nil (symbol-package found-symbol) (symbol-name found-symbol) ,(string-downcase thing))
                                        :class ,(concatenate 'string "ref-" (string-downcase thing)))))
 
          (docutils:add-child node (name-symbol found-symbol))
@@ -99,7 +96,7 @@ For example::
 (def-role package (name)
   (if-let ((package (uiop:find-package* (string-upcase name) nil)))
     (let ((node (docutils:make-node 'docutils.nodes:reference
-                                    :refuri (format nil "~a.html"
+                                    :refuri (coo::make-url nil
                                                     (-> package
                                                         package-name
                                                         string-downcase))

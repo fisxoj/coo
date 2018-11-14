@@ -16,25 +16,46 @@
 
 (in-package :coo)
 
-(defparameter +headings+ '(#\= #\- #\_ #\~ #\^))
+
+(defparameter +headings+ '(#\= #\- #\_ #\~ #\^)
+  "Different symbols that can be used to frame headers in ReST.")
 
 
-(defun package-path (package)
-  "Provide a pathname for a package in a predictable way."
-
-  (make-pathname :name (string-downcase (package-name package))
-                 :type "html"))
+(djula:add-template-directory (asdf:system-relative-pathname :coo "templates/"))
 
 
-(defun document-package (name &optional (base-path #P"docs/"))
-  "Generates documentation in html form for package named by :param:`name`."
+(defun document-package (package-index &optional (base-path #P"docs/"))
+  "Generates documentation in html form for :param:`package-index`."
 
-  (let* ((package (find-package name))
-         (pathname (merge-pathnames (package-path package) base-path))
-         (coo.roles:*context-package* package))
+  (let* ((pathname (make-pathname :defaults base-path
+                                  :name (-> package-index docparser:package-index-name string-downcase)
+                                  :type "rst"
+                                  :version nil))
+         (coo.roles:*context-package* (find-package (docparser:package-index-name package-index)))
+         (args (list :variables nil
+                     :functions nil
+                     :macros nil
+                     :generic-functions nil
+                     :structures nil
+                     :classes nil)))
+
+    (docparser:do-nodes (node package-index)
+      (typecase node
+        (docparser:variable-node (push node (getf args :variables)))
+        (docparser:function-node (push node (getf args :functions)))
+        (docparser:macro-node (push node (getf args :macros)))
+        (docparser:generic-function-node (push node (getf args :generic-functions)))
+        (docparser:struct-node (push node (getf args :structures)))
+        (docparser:class-node (push node (getf args :classes)))
+        (t (warn "Not handling node of type ~a" (class-of node)))))
 
     (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
-      (docutils:write-html s (docutils:read-rst (package-node package))))))
+      (apply #'djula:render-template* "package-index.rst" s
+             :package package-index
+             args))
+
+    (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (docutils:write-html s (docutils:read-rst pathname)))))
 
 
 (defun make-title (title stream &key (level 0))
@@ -46,6 +67,54 @@
 	    title
 	    marker)))
 
+
+(djula::def-filter :title (it &optional (level 0))
+  (make-title it nil :level level))
+
+
+(defun make-url (stream package &optional symbol-name type)
+  (format stream "~(~a~).html~@[#~(~a~)__~(~a~)~]" package type symbol-name))
+
+
+(defun make-anchor (stream &optional symbol-name type)
+  (format stream "~@[~(~a~)__~(~a~)~]" type symbol-name))
+
+
+(defgeneric linkify (object stream)
+  (:documentation "Generate a relative url to this thing.")
+
+  (:method ((object docparser:package-index) stream)
+    (make-url stream (docparser:package-index-name object)))
+
+  (:method ((object docparser:name-node) stream)
+    (let* ((symbol (docparser:node-name object))
+           (class-name (-> object class-of class-name string-downcase))
+           (node-type (if (str:ends-with-p "-node" class-name)
+                          (subseq class-name 0 (- (length class-name) (length "-node")))
+                          class-name)))
+
+      (make-url stream (symbol-package symbol) (symbol-name symbol) node-type))))
+
+
+(defgeneric anchorfy (object stream)
+  (:documentation "Generate an anchor reference in rst to this thing.")
+
+  (:method ((object docparser:name-node) stream)
+    (let* ((symbol (docparser:node-name object))
+           (class-name (-> object class-of class-name string-downcase))
+           (node-type (if (str:ends-with-p "-node" class-name)
+                          (subseq class-name 0 (- (length class-name) (length "-node")))
+                          class-name)))
+
+      (make-anchor stream (symbol-name symbol) node-type))))
+
+
+(djula::def-filter :linkify (it)
+  (linkify it nil))
+
+
+(djula::def-filter :anchorfy (it)
+  (anchorfy it nil))
 
 (defun render-section (title type specs stream)
   (make-title title stream :level 1)
@@ -98,30 +167,7 @@
       path)))
 
 
-(defparameter +sub-package-separators+
-  '(#\/ #\.)
-  "List of characters that could be used to separate a base package name like ``cool-package`` from sub-packages like ``cool-package.types`` or ``cool-package/types``.")
-
-
-(defun make-sub-package-matcher (system-name)
-  "Creates a predicate function that determines if a package is likely a child of the system named :param:`system-name`."
-
-  (let ((regex (ppcre:create-scanner (format nil "^~a[~{~a~}].*" system-name +sub-package-separators+)
-                                     :case-insensitive-mode t)))
-    (lambda (candidate)
-      (or (string-equal system-name candidate)
-          (ppcre:scan regex candidate)))))
-
-
-(defun discover-system-packages (system-name)
-  "Based on the assumption that all packages a system defines should start with that system's own name, find all the packages that are likely children."
-
-  (->> (list-all-packages)
-       (mapcar #'package-name)
-       (remove-if-not (make-sub-package-matcher system-name))))
-
-
-(defun document-system (system &key (base-path #P"docs/") (discover-packages t) packages)
+(defun document-system (system &key (base-path #P"docs/"))
   "Generate documentation for :param:`system` in :param:`base-path`.
 
 If :param:`discover-packages` is true (the default), it will try to figure out all the packages that are likely defined by the system and generate documentation for all of them, too.  If :param:`discover-packages` is ``nil``, it will fall-back to whatever packages are defined by :param:`packages`."
@@ -129,66 +175,72 @@ If :param:`discover-packages` is true (the default), it will try to figure out a
   (unless (typep system 'asdf:system)
     (setq system (asdf:find-system system)))
 
-  (let ((index-path (merge-pathnames #P"index.html" base-path)))
-    (uiop:ensure-all-directories-exist (list index-path))
-    (with-open-file (s index-path :direction :output :if-exists :supersede :if-does-not-exist :create)
-      (docutils:write-html s (docutils:read-rst (system-node system
-                                                             (-> (if discover-packages
-                                                                     (discover-system-packages (asdf:component-name system))
-                                                                     packages)
-                                                                 (sort #'string<))
-                                                             base-path)))))
+  (let ((index-path (merge-pathnames #P"index.rst" base-path))
+        (index (docparser:parse system))
+        ;; Disable auto-escape because it's for html and we're using ReST
+        (djula:*auto-escape* nil)
+        (djula:*catch-template-errors-p* nil))
 
-  (dolist (package-name (if discover-packages (discover-system-packages (asdf:component-name system)) packages))
-      (let ((package (find-package package-name)))
-        (document-package package base-path)))
+    (uiop:ensure-all-directories-exist (list index-path))
+    (uiop:temporary-directory)
+    (with-open-file (s index-path :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (djula:render-template* "index.rst" s
+                              :system system
+                              :index index))
+
+    (with-open-file (s (make-pathname :defaults index-path :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (docutils:write-html s (docutils:read-rst index-path)))
+
+
+    (docparser:do-packages (package index)
+      (document-package package base-path)))
 
   ;; Copy styles to new directory
   (uiop:copy-file (asdf:system-relative-pathname :coo "default.css")
                   (merge-pathnames #P"default.css" base-path)))
 
 
-(defun system-collect-metadata (system stream)
-  "Collect various metadata about a system such as a the author, license, &c."
+;; (defun system-collect-metadata (system stream)
+;;   "Collect various metadata about a system such as a the author, license, &c."
 
-  (macrolet ((info (key)
-               (with-gensyms (var)
-                 `(when-let ((,var (,(read-from-string (str:concat "ASDF:SYSTEM-" (symbol-name key))) system)))
-                    (format stream "~&~15a~a~%" ,(string-downcase (str:concat ":" (symbol-name key) ":")) ,var)))))
+;;   (macrolet ((info (key)
+;;                (with-gensyms (var)
+;;                  `(when-let ((,var (,(read-from-string (str:concat "ASDF:SYSTEM-" (symbol-name key))) system)))
+;;                     (format stream "~&~15a~a~%" ,(string-downcase (str:concat ":" (symbol-name key) ":")) ,var)))))
 
-    (info author)
-    (when-let ((version (asdf:component-version system)))
-      (format stream "~&~15a~a~%" ":version:" version))
-    (info license)
-    (info homepage)))
+;;     (info author)
+;;     (when-let ((version (asdf:component-version system)))
+;;       (format stream "~&~15a~a~%" ":version:" version))
+;;     (info license)
+;;     (info homepage)))
 
 
-(defun system-node (system packages base-path)
-  (uiop:with-temporary-file (:stream s
-                             :pathname path
-                             :direction :output
-                             :keep t
-                             :type "rst"
-                             :element-type 'character)
-    (make-title (asdf:component-name system) s)
+;; (defun system-node (system packages base-path)
+;;   (uiop:with-temporary-file (:stream s
+;;                              :pathname path
+;;                              :direction :output
+;;                              :keep t
+;;                              :type "rst"
+;;                              :element-type 'character)
+;;     (make-title (asdf:component-name system) s)
 
-    (system-collect-metadata system s)
+;;     (system-collect-metadata system s)
 
-    (format s "~&~a~%~%"
-            (or (asdf:system-long-description system)
-                (asdf:system-description system)
-                ""))
+;;     (format s "~&~a~%~%"
+;;             (or (asdf:system-long-description system)
+;;                 (asdf:system-description system)
+;;                 ""))
 
-    (make-title "Packages" s :level 1)
-    (dolist (package-name packages)
-      (let ((package (find-package package-name)))
-        (format s "~&* `~a <~a>`_~%~%"
-                (string-downcase package-name)
-                (package-path package))
-        ;; (format s "~%`~a <~a>`_~%  ~a~%~%"
-        ;;         (string-downcase package-name)
-        ;;         (package-path package)
-        ;;         (or (documentation package t) ""))
-        ))
+;;     (make-title "Packages" s :level 1)
+;;     (dolist (package-name packages)
+;;       (let ((package (find-package package-name)))
+;;         (format s "~&* `~a <~a>`_~%~%"
+;;                 (string-downcase package-name)
+;;                 (package-path package))
+;;         ;; (format s "~%`~a <~a>`_~%  ~a~%~%"
+;;         ;;         (string-downcase package-name)
+;;         ;;         (package-path package)
+;;         ;;         (or (documentation package t) ""))
+;;         ))
 
-    path))
+;;     path))

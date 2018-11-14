@@ -8,9 +8,12 @@
 	       "cl-arrows"
                "str"
                "docutils"
+	       "docparser"
+               "djula"
                "quri")
   :pathname "src"
   :components ((:file "roles")
+	       (:file "introspection")
                (:file "coo"))
   :in-order-to ((test-op (test-op coo-test)))
   :source-control (:git "https://github.com/fisxoj/coo.git")
