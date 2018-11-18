@@ -6,7 +6,9 @@
 ---------
 Variables
 ---------
-{% for variable in variables %}{% include "variable.rst" %}{% endfor %}{% endif %}
+{% for variable in variables %}
+{% include "variable.rst" %}
+{% endfor %}{% endif %}
 
 {% if functions %}
 ---------

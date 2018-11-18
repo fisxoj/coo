@@ -2,7 +2,7 @@
 
 {% if system.author %}:author: {{ system.author }}{% endif %}
 {% if system.version %}:version: {{ system.version }}{% endif %}
-{% if system.license %}:license: {{ system.license }}{% endif %}
+{% if system.licence %}:license: {{ system.licence }}{% endif %}
 {% if system.homepage %}:homepage: {{ system.homepage }}{% endif %}
 
 {% if system.long-description %}

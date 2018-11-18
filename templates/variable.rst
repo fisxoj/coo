@@ -1,4 +1,5 @@
 .. _{{ variable |anchorfy }}:
 
 ``{{ variable.node-name |lower}}``
-{{ variable.node-docstring }}
+
+  {{ variable.node-docstring }}
