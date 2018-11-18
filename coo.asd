@@ -9,6 +9,7 @@
                "str"
                "docutils"
 	       "docparser"
+               "hyperspec"
                "djula"
                "quri")
   :pathname "src"

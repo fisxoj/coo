@@ -12,15 +12,22 @@
 (defun make-url (stream package &optional symbol-name type)
   "Make a url for a thing of type :param:`type`, named :param:`symbol-name` located in package :param:`package`."
 
-  (format stream "~(~a~).html~@[#~(~a~)__~(~a~)~]"
-	  (typecase package
-	    (string package)
-	    (package (package-name package)))
-	  type
-	  symbol-name))
+  (unless (typep package 'package)
+    (setf package (find-package (string-upcase package))))
+
+  (cond
+    ((equal package (find-package :common-lisp))
+     (hyperspec:lookup symbol-name))
+    (t
+     (format stream "~(~a~).html~@[#~(~a~)__~(~a~)~]"
+             (typecase package
+               (string package)
+               (package (package-name package)))
+             type
+             symbol-name))))
 
 
 (defun make-anchor (stream &optional symbol-name type)
-  "Generate an achor string for RST."
+  "Generate an anchor string for RST."
 
   (format stream "~@[~(~a~)__~(~a~)~]" type symbol-name))
