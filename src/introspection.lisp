@@ -6,7 +6,7 @@
 
 
 (defun absolute-path-to-system-relative (system pathname)
-  "Create a path relative to SYSTEM pointing to PATHNAME.  Will only work on paths that are subdirectories of the path of SYSTEM."
+  "Create a path relative to :param:`system` pointing to :param:`pathname`.  Will only work on paths that are subdirectories of the path of :param:`system`."
 
   (let ((absolute-directory (pathname-directory pathname))
         (system-directory (pathname-directory (asdf:system-relative-pathname system ""))))
@@ -15,7 +15,7 @@
 
 
 (defun count-lines-up-to-character (pathname character-count)
-  "Reads through PATHNAME and counts the number of newlines before reaching CHARACTER-COUNT."
+  "Reads through :param:`pathname` and counts the number of newlines before reaching :param:`character-count`."
 
   (with-open-file (s pathname)
     (loop for count from 0 by 1
@@ -40,11 +40,14 @@
 
           until (> count character-count)
 
-          finally (return line))))
+          finally (return (1+ line)))))
 
 
 (defun find-definition-line-number (system object)
-  #+sbcl(sbcl-find-definition-line-number system object))
+  "Returns ``(values relative-path line-number)``, for a given reference.  Uses implementation-specific functions to try to get at the info or returns ``(values nil nil)`` if unimplemented."
+
+  #+sbcl(sbcl-find-definition-line-number system object)
+  #-sbcl(values nil nil))
 
 
 #+sbcl
