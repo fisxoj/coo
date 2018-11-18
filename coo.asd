@@ -8,9 +8,15 @@
 	       "cl-arrows"
                "str"
                "docutils"
-               "quri")
+	       "docparser"
+               "hyperspec"
+               "djula"
+               "quri"
+               #+sbcl "sb-introspect")
   :pathname "src"
-  :components ((:file "roles")
+  :components ((:file "util")
+	       (:file "roles")
+	       (:file "introspection")
                (:file "coo"))
   :in-order-to ((test-op (test-op coo-test)))
   :source-control (:git "https://github.com/fisxoj/coo.git")

@@ -9,28 +9,19 @@
 <div id="coo-roles-package" class="document"><h1 class="title">coo.roles package</h1>
 <p>This package defines a few new roles that are helpful for lisp documentation.</p>
 <div id="variables" class="section"><h2><a name="variables">Variables</a></h2>
-<a id="variable-2acontext-package-2a" class="target" name="variable-2acontext-package-2a"></a><dl class="docutils"><dt><tt class="docutils literal">
-<span class="pre">*context-package*</span></tt></dt>
-<dd>If non-nil, the current package context.  Influences the reading and printing of symbols by <a class="reference ref-function" href="coo.roles.html#function-name-symbol"><span class="ref-function">name-symbol</span></a> and <a class="reference ref-function" href="coo.roles.html#function-find-symbol-by-name"><span class="ref-function">find-symbol-by-name</span></a>.</dd>
-</dl>
-</div>
+<a id="variable-context-package" class="target" name="variable-context-package"></a><p><tt class="docutils literal">
+<span class="pre">*context-package*</span></tt></p>
+<blockquote> If non-nil, the current package context.  Influences the reading and printing of symbols by <a class="reference ref-function" href="coo.roles.html#function__name-symbol"><span class="ref-function">name-symbol</span></a> and <a class="reference ref-function" href="coo.roles.html#function__find-symbol-by-name"><span class="ref-function">find-symbol-by-name</span></a>.</blockquote> </div>
 <div id="functions" class="section"><h2><a name="functions">Functions</a></h2>
-<a id="function-find-symbol-by-name" class="target" name="function-find-symbol-by-name"></a><dl class="docutils"><dt><tt class="docutils literal">
-<span class="pre">find-symbol-by-name</span></tt></dt>
-<dd>Search for the symbol named by <tt class="docutils literal param">
-<span class="pre">str</span></tt> in the current context.  If it's unqualified, look in <a class="reference ref-variable" href="coo.roles.html#variable-%2acontext-package%2a"><span class="ref-variable">*context-package*</span></a>, then <tt class="docutils literal">
-<span class="pre">common-lisp</span></tt> then give up.</dd>
-</dl>
-<a id="function-anchor-name-for-symbol" class="target" name="function-anchor-name-for-symbol"></a><dl class="docutils"><dt><tt class="docutils literal">
-<span class="pre">anchor-name-for-symbol</span></tt></dt>
-<dd>Generates a url-safe name for <tt class="docutils literal param">
-<span class="pre">symbol</span></tt>.</dd>
-</dl>
-<p>e.g. <em><span>some-variable</span></em> =&gt; "%2Asome-variable%2A"</p>
-<a id="function-name-symbol" class="target" name="function-name-symbol"></a><dl class="docutils"><dt><tt class="docutils literal">
-<span class="pre">name-symbol</span></tt></dt>
-<dd>Used for formatting names of symbols.  Will take into account <a class="reference ref-variable" href="coo.roles.html#variable-%2acontext-package%2a"><span class="ref-variable">*context-package*</span></a> if non-nil.</dd>
-<dt>For example::</dt>
+<a id="function-find-symbol-by-name" class="target" name="function-find-symbol-by-name"></a><p><tt class="docutils literal">
+<span class="pre">find-symbol-by-name</span> <span class="pre">(str)</span></tt></p>
+<p>Search for the symbol named by <tt class="docutils literal param">
+<span class="pre">str</span></tt> in the current context.  If it's unqualified, look in <a class="reference ref-variable" href="coo.roles.html#variable__*context-package*"><span class="ref-variable">*context-package*</span></a>, then <tt class="docutils literal">
+<span class="pre">common-lisp</span></tt> then give up.</p>
+<a id="function-name-symbol" class="target" name="function-name-symbol"></a><p><tt class="docutils literal">
+<span class="pre">name-symbol</span> <span class="pre">(symbol)</span></tt></p>
+<p>Used for formatting names of symbols.  Will take into account <a class="reference ref-variable" href="coo.roles.html#variable__*context-package*"><span class="ref-variable">*context-package*</span></a> if non-nil.</p>
+<dl class="docutils"><dt>For example::</dt>
 <dd><p class="first">coo.roles&gt; (name-symbol 'name-symbol) "coo.roles::name-symbol"</p>
 <dl class="docutils"><dt>coo.roles&gt; (let ((<em><span>context-package</span></em> (find-package 'coo.roles)))</dt>
 <dd>(name-symbol 'name-symbol))</dd>
@@ -39,8 +30,13 @@
 <p class="last">coo.roles&gt; (name-symbol 'cl:list) "common-lisp:list"</p>
 </dd>
 </dl>
+<a id="function-anchor-name-for-symbol" class="target" name="function-anchor-name-for-symbol"></a><p><tt class="docutils literal">
+<span class="pre">anchor-name-for-symbol</span> <span class="pre">(symbol)</span></tt></p>
+<p>Generates a url-safe name for <tt class="docutils literal param">
+<span class="pre">symbol</span></tt>.</p>
+<p>e.g. <em><span>some-variable</span></em> =&gt; "%2Asome-variable%2A"</p>
 </div>
-<hr class ="docutils footer" /><div class="footer">Generated on : Mon, 03 Sep 2018 22:58:00 .
+<hr class ="docutils footer" /><div class="footer">Generated on : Sun, 18 Nov 2018 16:20:47 .
 Generated by cl-docutils 0.1.1 from <a class="reference" href="http://docutils.sourceforge.net/rst.html"><span>restructured text</span></a> source.
 </div>
 </div>
