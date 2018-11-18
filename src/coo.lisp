@@ -40,14 +40,15 @@
                      :classes nil)))
 
     (docparser:do-nodes (node package-index)
-      (typecase node
-        (docparser:variable-node (push node (getf args :variables)))
-        (docparser:function-node (push node (getf args :functions)))
-        (docparser:macro-node (push node (getf args :macros)))
-        (docparser:generic-function-node (push node (getf args :generic-functions)))
-        (docparser:struct-node (push node (getf args :structures)))
-        (docparser:class-node (push node (getf args :classes)))
-        (t (warn "Not handling node of type ~a" (class-of node)))))
+      (when (docparser:symbol-external-p (docparser:node-name node))
+        (typecase node
+          (docparser:variable-node (push node (getf args :variables)))
+          (docparser:function-node (push node (getf args :functions)))
+          (docparser:macro-node (push node (getf args :macros)))
+          (docparser:generic-function-node (push node (getf args :generic-functions)))
+          (docparser:struct-node (push node (getf args :structures)))
+          (docparser:class-node (push node (getf args :classes)))
+          (t (warn "Not handling node of type ~a" (class-of node))))))
 
     (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
       (apply #'djula:render-template* "package-index.rst" s
