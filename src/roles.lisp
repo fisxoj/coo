@@ -77,7 +77,7 @@ which lets you make references in your docstrings!"
   `(def-role ,thing (symbol)
      (if-let ((found-symbol (find-symbol-by-name symbol)))
        (let ((node (docutils:make-node 'docutils.nodes:reference
-                                       :refuri (coo::make-url nil (symbol-package found-symbol) (symbol-name found-symbol) ,(string-downcase thing))
+                                       :refuri (coo.util:make-url nil (symbol-package found-symbol) (symbol-name found-symbol) ,(string-downcase thing))
                                        :class ,(concatenate 'string "ref-" (string-downcase thing)))))
 
          (docutils:add-child node (name-symbol found-symbol))
@@ -96,7 +96,7 @@ which lets you make references in your docstrings!"
 (def-role package (name)
   (if-let ((package (uiop:find-package* (string-upcase name) nil)))
     (let ((node (docutils:make-node 'docutils.nodes:reference
-                                    :refuri (coo::make-url nil
+                                    :refuri (coo.util:make-url nil
                                                     (-> package
                                                         package-name
                                                         string-downcase))

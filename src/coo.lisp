@@ -72,19 +72,11 @@
   (make-title it nil :level level))
 
 
-(defun make-url (stream package &optional symbol-name type)
-  (format stream "~(~a~).html~@[#~(~a~)__~(~a~)~]" package type symbol-name))
-
-
-(defun make-anchor (stream &optional symbol-name type)
-  (format stream "~@[~(~a~)__~(~a~)~]" type symbol-name))
-
-
 (defgeneric linkify (object stream)
   (:documentation "Generate a relative url to this thing.")
 
   (:method ((object docparser:package-index) stream)
-    (make-url stream (docparser:package-index-name object)))
+    (coo.util:make-url stream (docparser:package-index-name object)))
 
   (:method ((object docparser:name-node) stream)
     (let* ((symbol (docparser:node-name object))
@@ -93,7 +85,7 @@
                           (subseq class-name 0 (- (length class-name) (length "-node")))
                           class-name)))
 
-      (make-url stream (symbol-package symbol) (symbol-name symbol) node-type))))
+      (coo.util:make-url stream (symbol-package symbol) (symbol-name symbol) node-type))))
 
 
 (defgeneric anchorfy (object stream)
@@ -106,7 +98,7 @@
                           (subseq class-name 0 (- (length class-name) (length "-node")))
                           class-name)))
 
-      (make-anchor stream (symbol-name symbol) node-type))))
+      (coo.util:make-anchor stream (symbol-name symbol) node-type))))
 
 
 (djula::def-filter :linkify (it)

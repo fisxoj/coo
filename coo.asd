@@ -12,7 +12,8 @@
                "djula"
                "quri")
   :pathname "src"
-  :components ((:file "roles")
+  :components ((:file "util")
+	       (:file "roles")
 	       (:file "introspection")
                (:file "coo"))
   :in-order-to ((test-op (test-op coo-test)))
