@@ -11,7 +11,8 @@
 	       "docparser"
                "hyperspec"
                "djula"
-               "quri")
+               "quri"
+               #+sbcl "sb-introspect")
   :pathname "src"
   :components ((:file "util")
 	       (:file "roles")
