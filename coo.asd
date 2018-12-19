@@ -1,4 +1,4 @@
-(asdf:defsystem coo
+(defsystem coo
   :author "Matt Novenstern"
   :mailto "fisxoj@gmail.com"
   :license "LLGPLv3+"
@@ -18,7 +18,7 @@
 	       (:file "roles")
 	       (:file "introspection")
                (:file "coo"))
-  :in-order-to ((test-op (test-op coo-test)))
+  :in-order-to ((test-op (test-op coo/test)))
   :source-control (:git "https://github.com/fisxoj/coo.git")
   :description "Coo is a documentation processor that allows you to write your documentation in |RST|.  If you fill in all your docstrings, it will look at all the documentation for packages and systems and format the external symbols for each page.
 
@@ -33,3 +33,14 @@ and coo will take care of everything for you.  You can specify what directory it
 .. _Docutils: http://docutils.sourceforge.net/
 
 The source of coo is available at `https://github.com/fisxoj/coo <https://github.com/fisxoj/coo>`_.")
+
+
+(defsystem coo/test
+  :depends-on ("coo"
+	       "rove")
+  :pathname "t"
+  :components ((:file "coo")
+               (:file "roles"))
+  :perform (test-op (op c)
+		    (declare (ignore c))
+		    (funcall (read-from-string "rove:run") c)))
