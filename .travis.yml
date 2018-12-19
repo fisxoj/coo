@@ -15,7 +15,6 @@ env:
 install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
-  - ros install fisxoj/hyperspec
   - ros install rove
 
 cache:
