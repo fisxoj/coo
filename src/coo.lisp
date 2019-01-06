@@ -4,8 +4,7 @@
         #:alexandria)
   (:import-from #:docutils
                 #:add-child)
-  (:export #:document-package
-           #:document-system)
+  (:export #:document-system)
   (:documentation "Generally, you'll want to use :function:`document-system` to start yourself off.
 
 .. try running it like this::
@@ -175,9 +174,7 @@
 
 
 (defun document-system (system &key (base-path #P"docs/"))
-  "Generate documentation for :param:`system` in :param:`base-path`.
-
-If :param:`discover-packages` is true (the default), it will try to figure out all the packages that are likely defined by the system and generate documentation for all of them, too.  If :param:`discover-packages` is ``nil``, it will fall-back to whatever packages are defined by :param:`packages`."
+  "Generate documentation for :param:`system` in :param:`base-path`."
 
   (unless (typep system 'asdf:system)
     (setq system (asdf:find-system system)))

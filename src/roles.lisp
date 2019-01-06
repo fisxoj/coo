@@ -29,6 +29,7 @@ e.g. *some-variable* => \"%2Asome-variable%2A\""
   "Used for formatting names of symbols.  Will take into account :variable:`*context-package*` if non-nil.
 
 For example::
+
   coo.roles> (name-symbol 'name-symbol)
   \"coo.roles::name-symbol\"
 
