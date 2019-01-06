@@ -109,6 +109,19 @@
 (djula::def-filter :anchorfy (it)
   (anchorfy it nil))
 
+
+
+(djula::def-filter :remove-unintentional-whitespace (it)
+  "Renders a paragraph of text (probably a docstring) with any single leading spaces on each line trimmed.  This prevents errors in the restructured text, where leading whitespace can be meaningful, but allows lisp projects that don't use ReST in comments to process their line-broken docstrings."
+
+  (flet ((trim-at-most-one (line)
+	   (if (char= (char line 0) #\Space)
+	       (subseq line 1)
+	       line)))
+
+    (str:unlines (mapcar #'trim-at-most-one (str:lines it)))))
+
+
 (defun render-section (title type specs stream)
   (make-title title stream :level 1)
   (dolist (spec specs)
