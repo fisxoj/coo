@@ -4,8 +4,7 @@
         #:alexandria)
   (:import-from #:docutils
                 #:add-child)
-  (:export #:document-package
-           #:document-system)
+  (:export #:document-system)
   (:documentation "Generally, you'll want to use :function:`document-system` to start yourself off.
 
 .. try running it like this::
@@ -70,7 +69,8 @@
 
 
 (djula::def-filter :title (it &optional (level 0))
-  (make-title it nil :level level))
+  (let ((level (if (integerp level) level (parse-integer level))))
+    (make-title it nil :level level)))
 
 
 (defgeneric linkify (object stream)
@@ -108,6 +108,19 @@
 
 (djula::def-filter :anchorfy (it)
   (anchorfy it nil))
+
+
+
+(djula::def-filter :remove-unintentional-whitespace (it)
+  "Renders a paragraph of text (probably a docstring) with any single leading spaces on each line trimmed.  This prevents errors in the restructured text, where leading whitespace can be meaningful, but allows lisp projects that don't use ReST in comments to process their line-broken docstrings."
+
+  (flet ((trim-at-most-one (line)
+	   (if (char= (char line 0) #\Space)
+	       (subseq line 1)
+	       line)))
+
+    (str:unlines (mapcar #'trim-at-most-one (str:lines it)))))
+
 
 (defun render-section (title type specs stream)
   (make-title title stream :level 1)
@@ -161,9 +174,7 @@
 
 
 (defun document-system (system &key (base-path #P"docs/"))
-  "Generate documentation for :param:`system` in :param:`base-path`.
-
-If :param:`discover-packages` is true (the default), it will try to figure out all the packages that are likely defined by the system and generate documentation for all of them, too.  If :param:`discover-packages` is ``nil``, it will fall-back to whatever packages are defined by :param:`packages`."
+  "Generate documentation for :param:`system` in :param:`base-path`."
 
   (unless (typep system 'asdf:system)
     (setq system (asdf:find-system system)))

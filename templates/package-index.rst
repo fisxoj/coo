@@ -1,12 +1,14 @@
-{{ package.name |format:"~(~a~) package" |title }}
+{{ package.name |format:"``~(~a~)`` package" |title }}
 
 {{ package.docstring }}
+
+Exported symbols:
 
 {% if variables %}
 ---------
 Variables
 ---------
-{% for variable in variables %}
+{% for node in variables %}
 {% include "variable.rst" %}
 {% endfor %}{% endif %}
 
@@ -14,7 +16,7 @@ Variables
 ---------
 Functions
 ---------
-{% for function in functions %}
+{% for node in functions %}
 {% include "function.rst" %}
 {% endfor %}{% endif %}
 
@@ -22,24 +24,32 @@ Functions
 ------
 Macros
 ------
-{% for macro in macros %}{% include "macro.rst" %}{% endfor %}{% endif %}
+{% for node in macros %}
+{% include "macro.rst" %}
+{% endfor %}{% endif %}
 
 
 {% if generic-functions %}
 -----------------
 Generic Functions
 -----------------
-{% for generic-function in generic-functions %}{% include "generic-function.rst" %}{% endfor %}{% endif %}
+{% for node in generic-functions %}
+{% include "generic-function.rst" %}
+{% endfor %}{% endif %}
 
 
 {% if structures %}
 ----------
 Structures
 ----------
-{% for structure in structures %}{% include "generic-function.rst" %}{% endfor %}{% endif %}
+{% for node in structures %}
+{% include "generic-function.rst" %}
+{% endfor %}{% endif %}
 
 {% if classes %}
 -------
 Classes
 -------
-{% for class in classes %}{% include "class.rst" %}{% endfor %}{% endif %}
+{% for node in classes %}
+{% include "class.rst" %}
+{% endfor %}{% endif %}
