@@ -1,5 +1,4 @@
-.. _{{ function |anchorfy }}:
+{% extends "base.rst" %}
 
-``{{ function.node-name |lower}} {{ function.lambda-list |lower}}``
-
-{{ function.node-docstring }}
+{% block metadata %}{% if node.lambda-list %}``{{ node.lambda-list }}``{% else %}{% endif %}
+{% endblock %}
