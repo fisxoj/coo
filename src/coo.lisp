@@ -70,7 +70,8 @@
 
 
 (djula::def-filter :title (it &optional (level 0))
-  (make-title it nil :level level))
+  (let ((level (if (integerp level) level (parse-integer level))))
+    (make-title it nil :level level)))
 
 
 (defgeneric linkify (object stream)
