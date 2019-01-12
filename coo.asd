@@ -28,7 +28,7 @@ To generate documentation for your system, you should be able to run::
 
   CL-USER> (coo:document-system :my-system)
 
-and coo will take care of everything for you.  You can specify what directory it writes the documentation to as well.  Coo is built on top of `cl-docutils`_ by John A.R. Williams, which is, in turn modeled on the Python implementation of `Docutils`_.
+and coo will take care of everything for you.  You can specify what directory it writes the documentation to as well (see :function:`coo:document-system`).  Coo is built on top of `cl-docutils`_ by John A.R. Williams, which is, in turn modeled on the Python implementation of `Docutils`_.
 
 If you're interested in modifying the output of the documentation generation, you can look at the templates under the `templates/` directory in coo's source code.  Eventually, there will be an extensible `way of doing that <https://github.com/fisxoj/coo/issues/14>`_.
 
