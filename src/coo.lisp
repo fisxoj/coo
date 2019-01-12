@@ -115,7 +115,9 @@
   "Renders a paragraph of text (probably a docstring) with any single leading spaces on each line trimmed.  This prevents errors in the restructured text, where leading whitespace can be meaningful, but allows lisp projects that don't use ReST in comments to process their line-broken docstrings."
 
   (flet ((trim-at-most-one (line)
-	   (if (char= (char line 0) #\Space)
+	   (if (and (> (length line) 2)
+		    (char= (char line 0) #\Space)
+		    (char/= (char line 1) #\Space))
 	       (subseq line 1)
 	       line)))
 
