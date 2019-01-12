@@ -26,3 +26,19 @@
 
     (ok (str:ends-with? #.(write-to-string #\Newline :escape nil) (try "Some Titile"))
 	"Title block ends with a newline.")))
+
+(deftest test-remove-unintentional-whitespace
+    (let ((cases '("It leaves an empty string alone." ("" "")
+                   "It strips leading single spaces from docstrings." ("First line
+ second line." "First line
+second line.")
+                   "It doesn't strip leading whitespace of two or more spaces." ("Here's an example
+::
+  cl-user> (string= \"potato\" \"yam\")
+  nil" "Here's an example
+::
+  cl-user> (string= \"potato\" \"yam\")
+  nil"))))
+      (loop for (description (input expected)) on cases by #'cddr
+            do (ok (string= (djula.filters:remove-unintentional-whitespace input) expected)
+                   description))))
