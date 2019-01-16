@@ -7,7 +7,7 @@
   (:export #:document-system)
   (:documentation "Generally, you'll want to use :function:`document-system` to start yourself off.
 
-.. try running it like this::
+try running it like this::
 
     CL-USER> (ql:quickload :coo)
     CL-USER> (coo:document-system :my-cool-system)

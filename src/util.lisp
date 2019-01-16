@@ -19,12 +19,10 @@
     ((equal package (find-package :common-lisp))
      (hyperspec:lookup symbol-name))
     (t
-     (format stream "~(~a~).html~@[#~(~a~)__~(~a~)~]"
-             (typecase package
-               (string package)
-               (package (package-name package)))
-             type
-             symbol-name))))
+     (format stream "~(~a~).html~@[#~*~a~]"
+             (package-name package)
+             symbol-name
+             (make-anchor nil symbol-name type)))))
 
 
 (defun make-anchor (stream &optional symbol-name type)

@@ -43,7 +43,8 @@ The source of coo is available at `https://github.com/fisxoj/coo <https://github
 	       "rove")
   :pathname "t"
   :components ((:file "coo")
-               (:file "roles"))
+               (:file "roles")
+               (:file "util"))
   :perform (test-op (op c)
 		    (declare (ignore c))
 		    (funcall (read-from-string "rove:run") c)))
