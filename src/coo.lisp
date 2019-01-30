@@ -23,8 +23,12 @@ try running it like this::
 (djula:add-template-directory (asdf:system-relative-pathname :coo "templates/"))
 
 
-(defun document-package (package-index &optional (base-path #P"docs/"))
-  "Generates documentation in html form for :param:`package-index`."
+(defun document-package (package-index &key keep-rst (base-path #P"docs/"))
+  "Generates documentation in html form for :param:`package-index`.
+
+The documentation file will have the pathanme ``{{base-path}}{{package-name}}.html``, so a package named ``cool-package`` with :param:`base-dir` ``docs/`` will have the generated pathame ``docs/cool-package.html``.
+
+If :param:`keep-rst` is truthy, don't delete the intermediate restructured text file."
 
   (let* ((pathname (make-pathname :defaults base-path
                                   :name (-> package-index docparser:package-index-name string-downcase)
@@ -49,13 +53,18 @@ try running it like this::
           (docparser:class-node (push node (getf args :classes)))
           (t (warn "Not handling node of type ~a" (class-of node))))))
 
-    (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
-      (apply #'djula:render-template* "package-index.rst" s
-             :package package-index
-             args))
+    (unwind-protect
+	 (progn
+	   (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
+	     (apply #'djula:render-template* "package-index.rst" s
+		    :package package-index
+		    args))
 
-    (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
-      (docutils:write-html s (docutils:read-rst pathname)))))
+	   (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
+	     (docutils:write-html s (docutils:read-rst pathname))))
+
+      (unless keep-rst
+	(uiop:delete-file-if-exists pathname)))))
 
 
 (defun make-title (title stream &key (level 0))
@@ -175,8 +184,10 @@ try running it like this::
       path)))
 
 
-(defun document-system (system &key (base-path #P"docs/"))
-  "Generate documentation for :param:`system` in :param:`base-path`."
+(defun document-system (system &key keep-rst (base-path #P"docs/"))
+  "Generate documentation for :param:`system` in :param:`base-path`.
+
+If :param:`keep-rst` is truthy, don't delete the intermediate restructured text file."
 
   (unless (typep system 'asdf:system)
     (setq system (asdf:find-system system)))
@@ -189,64 +200,25 @@ try running it like this::
 
     (uiop:ensure-all-directories-exist (list index-path))
     (uiop:temporary-directory)
-    (with-open-file (s index-path :direction :output :if-exists :supersede :if-does-not-exist :create)
-      (djula:render-template* "index.rst" s
-                              :system system
-                              :index index))
+    (unwind-protect
+	 (progn
+	   (with-open-file (s index-path :direction :output :if-exists :supersede :if-does-not-exist :create)
+	     (djula:render-template* "index.rst" s
+				     :system system
+				     :index index))
 
-    (with-open-file (s (make-pathname :defaults index-path :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
-      (docutils:write-html s (docutils:read-rst index-path)))
+	   (with-open-file (s (make-pathname :defaults index-path :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
+	     (docutils:write-html s (docutils:read-rst index-path))))
+
+      (unless keep-rst
+	(uiop:delete-file-if-exists index-path)))
 
 
     (docparser:do-packages (package index)
-      (document-package package base-path)))
+      (document-package package
+			:keep-rst keep-rst
+			:base-path base-path)))
 
   ;; Copy styles to new directory
   (uiop:copy-file (asdf:system-relative-pathname :coo "default.css")
                   (merge-pathnames #P"default.css" base-path)))
-
-
-;; (defun system-collect-metadata (system stream)
-;;   "Collect various metadata about a system such as a the author, license, &c."
-
-;;   (macrolet ((info (key)
-;;                (with-gensyms (var)
-;;                  `(when-let ((,var (,(read-from-string (str:concat "ASDF:SYSTEM-" (symbol-name key))) system)))
-;;                     (format stream "~&~15a~a~%" ,(string-downcase (str:concat ":" (symbol-name key) ":")) ,var)))))
-
-;;     (info author)
-;;     (when-let ((version (asdf:component-version system)))
-;;       (format stream "~&~15a~a~%" ":version:" version))
-;;     (info license)
-;;     (info homepage)))
-
-
-;; (defun system-node (system packages base-path)
-;;   (uiop:with-temporary-file (:stream s
-;;                              :pathname path
-;;                              :direction :output
-;;                              :keep t
-;;                              :type "rst"
-;;                              :element-type 'character)
-;;     (make-title (asdf:component-name system) s)
-
-;;     (system-collect-metadata system s)
-
-;;     (format s "~&~a~%~%"
-;;             (or (asdf:system-long-description system)
-;;                 (asdf:system-description system)
-;;                 ""))
-
-;;     (make-title "Packages" s :level 1)
-;;     (dolist (package-name packages)
-;;       (let ((package (find-package package-name)))
-;;         (format s "~&* `~a <~a>`_~%~%"
-;;                 (string-downcase package-name)
-;;                 (package-path package))
-;;         ;; (format s "~%`~a <~a>`_~%  ~a~%~%"
-;;         ;;         (string-downcase package-name)
-;;         ;;         (package-path package)
-;;         ;;         (or (documentation package t) ""))
-;;         ))
-
-;;     path))
