@@ -1,5 +1,7 @@
 {{ package.name |format:"``~(~a~)`` package" |title }}
 
+`<< back to {{ system.name }} index <index.html>`_
+
 {{ package.docstring }}
 
 Exported symbols:
