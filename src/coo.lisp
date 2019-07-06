@@ -35,6 +35,10 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
                                   :type "rst"
                                   :version nil))
          (coo.roles:*context-package* (find-package (docparser:package-index-name package-index)))
+         (reader (make-instance 'docutils.parser.rst:rst-reader
+                                :settings '((:warnings . #P"docutils-warnings.log")
+                                            (:generator . nil)
+                                            (:resolve-media . nil))))
          (args (list :variables nil
                      :functions nil
                      :macros nil
@@ -61,7 +65,7 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
 		    args))
 
 	   (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
-	     (docutils:write-html s (docutils:read-rst pathname))))
+	     (docutils:write-html s (docutils:read-document pathname reader))))
 
       (unless keep-rst
 	(uiop:delete-file-if-exists pathname)))))
@@ -194,6 +198,11 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
 
   (let ((index-path (merge-pathnames #P"index.rst" base-path))
         (index (docparser:parse system))
+        ;; Customized RST-writer for docutils to muffle some errors
+        (reader (make-instance 'docutils.parser.rst:rst-reader
+                               :settings '((:warnings . #P"docutils-warnings.log")
+                                           (:generator . nil)
+                                           (:resolve-media . nil))))
         ;; Disable auto-escape because it's for html and we're using ReST
         (djula:*auto-escape* nil)
         (djula:*catch-template-errors-p* nil))
@@ -208,7 +217,7 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
 				     :index index))
 
 	   (with-open-file (s (make-pathname :defaults index-path :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
-	     (docutils:write-html s (docutils:read-rst index-path))))
+	     (docutils:write-html s (docutils:read-document index-path reader))))
 
       (unless keep-rst
 	(uiop:delete-file-if-exists index-path)))
