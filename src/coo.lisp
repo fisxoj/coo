@@ -23,7 +23,7 @@ try running it like this::
 (djula:add-template-directory (asdf:system-relative-pathname :coo "templates/"))
 
 
-(defun document-package (package-index &key keep-rst (base-path #P"docs/"))
+(defun document-package (package-index system &key keep-rst (base-path #P"docs/"))
   "Generates documentation in html form for :param:`package-index`.
 
 The documentation file will have the pathanme ``{{base-path}}{{package-name}}.html``, so a package named ``cool-package`` with :param:`base-dir` ``docs/`` will have the generated pathame ``docs/cool-package.html``.
@@ -61,6 +61,7 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
 	 (progn
 	   (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
 	     (apply #'djula:render-template* "package-index.rst" s
+                    :system system
 		    :package package-index
 		    args))
 
@@ -224,7 +225,7 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
 
 
     (docparser:do-packages (package index)
-      (document-package package
+      (document-package package system
 			:keep-rst keep-rst
 			:base-path base-path)))
 
