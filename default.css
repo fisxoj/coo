@@ -210,8 +210,9 @@ pre.address {
     font-size: 100% }
 
 pre.literal-block, pre.doctest-block {
-    margin-left: 2em ;
-    margin-right: 2em }
+    padding: 1em 2em;
+    background: #eee;
+    border-radius: 4px; }
 
 span.classifier {
     font-family: sans-serif ;
