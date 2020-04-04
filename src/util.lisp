@@ -28,4 +28,4 @@
 (defun make-anchor (stream &optional symbol-name type)
   "Generate an anchor string for RST."
 
-  (format stream "~@[~(~a~)__~(~a~)~]" type symbol-name))
+  (format stream "~@[~(~a~)-~(~a~)~]" type symbol-name))
