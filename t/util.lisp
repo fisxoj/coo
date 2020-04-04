@@ -19,4 +19,10 @@
 
 (deftest test-make-anchor
   (ok (string= (make-anchor nil "MAKE-ANCHOR" 'function)
-               "function-make-anchor")))
+               "function-make-anchor")
+      "Make an anchor for an uninteresting symbol.")
+
+  (testing "Make an anchor for and interesting symbol"
+    (ok (string= (make-anchor nil "*CONTEXT*" 'variable)
+                 "variable-%2acontext%2a")
+        "containgin a *.")))

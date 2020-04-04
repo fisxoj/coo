@@ -20,6 +20,10 @@ try running it like this::
   "Different symbols that can be used to frame headers in ReST.")
 
 
+(defvar *system* nil
+  "The system being processed.")
+
+
 (djula:add-template-directory (asdf:system-relative-pathname :coo "templates/"))
 
 
@@ -60,10 +64,11 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
     (unwind-protect
 	 (progn
 	   (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
-	     (apply #'djula:render-template* "package-index.rst" s
-                    :system system
-		    :package package-index
-		    args))
+             (let ((*system* system))
+               (apply #'djula:render-template* "package-index.rst" s
+                      :system system
+                      :package package-index
+                      args)))
 
 	   (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
 	     (docutils:write-html s (docutils:read-document pathname reader))))
@@ -123,6 +128,9 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
 (djula::def-filter :anchorfy (it)
   (anchorfy it nil))
 
+
+(djula::def-filter :metadata (node)
+  (coo.plugin:metadata-for-symbol *system* node))
 
 
 (djula::def-filter :remove-unintentional-whitespace (it)

@@ -6,6 +6,7 @@
   :depends-on ("asdf"
                "alexandria"
 	       "cl-arrows"
+               "pp-toml"
                "str"
                "docutils"
 	       "docparser"
@@ -15,8 +16,12 @@
                #+sbcl "sb-introspect")
   :pathname "src"
   :components ((:file "util")
+               (:file "config")
 	       (:file "roles")
 	       (:file "introspection")
+               (:file "plugin")
+               (:module plugins
+                :components ((:file "github")))
                (:file "coo"))
   :in-order-to ((test-op (test-op coo/test)))
   :source-control (:git "https://github.com/fisxoj/coo.git")
