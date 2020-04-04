@@ -43,6 +43,13 @@
           finally (return (1+ line)))))
 
 
+(defun node-type (object)
+  (declare (type docparser:node object))
+
+  (let ((name (string (class-name (class-of object)))))
+    (make-keyword (subseq name 0 (- (length name) (length "-node"))))))
+
+
 (defun find-definition-line-number (system object)
   "Returns ``(values relative-path line-number)``, for a given reference.  Uses implementation-specific functions to try to get at the info or returns ``(values nil nil)`` if unimplemented."
 
@@ -52,11 +59,14 @@
 
 #+sbcl
 (defun sbcl-find-definition-line-number (system object)
-  (let* ((definition-source (sb-introspect:find-definition-source object))
-         (pathname (sb-introspect:definition-source-pathname definition-source))
+  (if-let ((definition-source (first (sb-introspect:find-definition-sources-by-name
+                                        (docparser:node-name object)
+                                        (node-type object)))))
+    (let* ((pathname (sb-introspect:definition-source-pathname definition-source))
 
-         (line-number (if-let ((character-count (sb-introspect:definition-source-character-offset definition-source)))
-                        (count-lines-up-to-character pathname character-count)
-                        0)))
+           (line-number (if-let ((character-count (sb-introspect:definition-source-character-offset definition-source)))
+                          (count-lines-up-to-character pathname character-count)
+                          0)))
 
-    (values (absolute-path-to-system-relative system pathname) line-number)))
+      (values (absolute-path-to-system-relative system pathname) line-number))
+    (values nil nil)))

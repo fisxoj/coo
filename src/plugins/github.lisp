@@ -1,9 +1,13 @@
 (defpackage coo.plugins.github
-  (:use #:cl #:alexandria #:cl-arrows))
+  (:use #:cl))
 
 (in-package :coo.plugins.github)
 
-(defun definition-url (system object)
+(defun metadata (stream system object)
   (multiple-value-bind (relative-path line-number)
       (coo.introspection:find-definition-line-number system object)
-    (format nil "`[source] <https://github.com/~a/blob/master/~a#L~d>`_" "fisxoj/coo" relative-path line-number)))
+    (when (not (null relative-path))
+      (format stream "~&`\[source\] <https://github.com/~a/blob/master/~a~@[#L~d~]>`_~%"
+              (coo.plugin:config "project")
+              relative-path
+              line-number))))
