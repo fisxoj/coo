@@ -1,4 +1,4 @@
-FROM parentheticalenterprises/sbcl-quicklisp-base:2.0.0-2019-12-27
+FROM parentheticalenterprises/sbcl-quicklisp-base:2.0.3-2020-03-25
 
 COPY . /quicklisp/local-projects/coo
 
