@@ -27,6 +27,25 @@ try running it like this::
 (djula:add-template-directory (asdf:system-relative-pathname :coo "templates/"))
 
 
+(defun make-root-dir (package-name)
+  "Takes a string with the package name and returns another with the path
+   to the root of the documentation.
+
+   We need this because docs for package inferred packages live in the nested
+   subdirectories.
+
+   Here are examples of the output:
+
+   (make-root-dir-path \"foo\") -> \"\"
+   (make-root-dir-path \"foo/bar/baz\") -> \"../../\"
+"
+  (check-type package-name string)
+  
+  (let ((slash-count (count #\/ package-name)))
+    (str:repeat slash-count
+                "../")))
+
+
 (defun document-package (package-index system &key keep-rst (base-path #P"docs/"))
   "Generates documentation in html form for :param:`package-index`.
 
@@ -34,10 +53,14 @@ The documentation file will have the pathanme ``{{base-path}}{{package-name}}.ht
 
 If :param:`keep-rst` is truthy, don't delete the intermediate restructured text file."
 
-  (let* ((pathname (make-pathname :defaults base-path
-                                  :name (-> package-index docparser:package-index-name string-downcase)
-                                  :type "rst"
-                                  :version nil))
+  (let* ((package-name (-> package-index docparser:package-index-name string-downcase))
+         (pathname (merge-pathnames 
+                    ;; In package inferred ASDF systems
+                    ;; package names may include / as filenames
+                    ;; they belong to. Thus we have to treat
+                    ;; package-name as a pathname
+                    (uiop:parse-unix-namestring package-name :type "rst")
+                    base-path))
          (coo.roles:*context-package* (find-package (docparser:package-index-name package-index)))
          (reader (make-instance 'docutils.parser.rst:rst-reader
                                 :settings '((:warnings . #P"docutils-warnings.log")
@@ -49,32 +72,40 @@ If :param:`keep-rst` is truthy, don't delete the intermediate restructured text 
                      :generic-functions nil
                      :structures nil
                      :classes nil)))
+    (coo.util:with-root ((make-root-dir package-name))
+      (docparser:do-nodes (node package-index)
+        (when (docparser:symbol-external-p (docparser:node-name node))
+          (typecase node
+            (docparser:variable-node (push node (getf args :variables)))
+            (docparser:function-node (push node (getf args :functions)))
+            (docparser:macro-node (push node (getf args :macros)))
+            (docparser:generic-function-node (push node (getf args :generic-functions)))
+            (docparser:struct-node (push node (getf args :structures)))
+            (docparser:class-node (push node (getf args :classes)))
+            (t (warn "Not handling node of type ~a" (class-of node))))))
 
-    (docparser:do-nodes (node package-index)
-      (when (docparser:symbol-external-p (docparser:node-name node))
-        (typecase node
-          (docparser:variable-node (push node (getf args :variables)))
-          (docparser:function-node (push node (getf args :functions)))
-          (docparser:macro-node (push node (getf args :macros)))
-          (docparser:generic-function-node (push node (getf args :generic-functions)))
-          (docparser:struct-node (push node (getf args :structures)))
-          (docparser:class-node (push node (getf args :classes)))
-          (t (warn "Not handling node of type ~a" (class-of node))))))
+      (unwind-protect
+	   (progn
+             (ensure-directories-exist pathname)
+           
+	     (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
+               (let ((*system* system))
+                 (apply #'djula:render-template* "package-index.rst" s
+                        :root-dir (coo.util:root)
+                        :system system
+                        :package package-index
+                        args)))
 
-    (unwind-protect
-	 (progn
-	   (with-open-file (s pathname :direction :output :if-exists :supersede :if-does-not-exist :create)
-             (let ((*system* system))
-               (apply #'djula:render-template* "package-index.rst" s
-                      :system system
-                      :package package-index
-                      args)))
+	     (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
+	       (let ((rst-document (docutils:read-document pathname reader)))
+                 (setf (docutils:setting :stylesheet rst-document)
+                       (concatenate 'string
+                                    (coo.util:root)
+                                    "default.css"))
+                 (docutils:write-html s rst-document))))
 
-	   (with-open-file (s (make-pathname :defaults pathname :type "html") :direction :output :if-exists :supersede :if-does-not-exist :create)
-	     (docutils:write-html s (docutils:read-document pathname reader))))
-
-      (unless keep-rst
-	(uiop:delete-file-if-exists pathname)))))
+        (unless keep-rst
+	  (uiop:delete-file-if-exists pathname))))))
 
 
 (defun make-title (title stream &key (level 0))

@@ -1,6 +1,6 @@
 {{ package.name |format:"``~(~a~)`` package" |title }}
 
-`<< back to {{ system.name }} index <index.html>`_
+`<< back to {{ system.name }} index <{{ root-dir }}index.html>`_
 
 {{ package.docstring }}
 
