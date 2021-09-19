@@ -1,6 +1,6 @@
 (defpackage coo-test
   (:use #:cl
-	#:cl-arrows
+	#:arrows
 	#:coo
 	#:rove))
 

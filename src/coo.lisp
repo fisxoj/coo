@@ -1,6 +1,6 @@
 (defpackage coo
   (:use #:cl
-        #:cl-arrows
+        #:arrows
         #:alexandria)
   (:import-from #:docutils
                 #:add-child)

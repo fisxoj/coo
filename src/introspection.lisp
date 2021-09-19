@@ -1,5 +1,5 @@
 (defpackage coo.introspection
-  (:use #:cl #:alexandria #:cl-arrows)
+  (:use #:cl #:alexandria #:arrows)
   (:export #:find-definition-line-number))
 
 (in-package :coo.introspection)

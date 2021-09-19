@@ -1,5 +1,5 @@
 (defpackage coo.util
-  (:use #:cl #:alexandria #:cl-arrows)
+  (:use #:cl #:alexandria #:arrows)
 
   (:export #:make-url
 	   #:make-anchor)

@@ -5,7 +5,7 @@
   :homepage "https://fisxoj.github.io/coo/"
   :depends-on ("asdf"
                "alexandria"
-	       "cl-arrows"
+	       "arrows"
                "pp-toml"
                "str"
                "docutils"

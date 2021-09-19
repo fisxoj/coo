@@ -1,7 +1,7 @@
 (defpackage coo.roles
   (:use #:cl
         #:alexandria
-        #:cl-arrows
+        #:arrows
         #:docutils.parser.rst)
   (:export #:*context-package*
 	   #:name-symbol
